@@ -1,0 +1,155 @@
+{
+    "disclaimer": "This list is inferred from public product descriptions and common API functions. The definitive list of functions for a specific toy should be obtained via the GetToys API command for a connected device. Some names might represent product lines with similar core functions.",
+    "toys": {
+      "lush4": {
+        "name": "Lush 4",
+        "description": "Bluetooth® App-Controlled G-Spot Egg Vibrator",
+        "functions": ["Vibrate"]
+      },
+      "lush3": {
+        "name": "Lush 3",
+        "description": "Bluetooth Egg Vibrator",
+        "functions": ["Vibrate"]
+      },
+      "ferri": {
+        "name": "Ferri",
+        "description": "Magnetic Panty Vibrator",
+        "functions": ["Vibrate"]
+      },
+      "nora": {
+        "name": "Nora",
+        "description": "Bluetooth Remote Control Rabbit Vibrator",
+        "functions": ["Vibrate", "Rotate"]
+      },
+      "osci3": {
+        "name": "Osci 3",
+        "description": "G-spot clitoral dual stimulation rabbit vibrator",
+        "functions": ["Vibrate", "Rotate"] 
+      },
+      "mission2": {
+        "name": "Mission 2",
+        "description": "Vibrating Suction Cup Dildo with Advanced Touch-Sense Technology",
+        "functions": ["Vibrate"]
+      },
+      "flexer": {
+        "name": "Flexer",
+        "description": "Bluetooth Insertable Dual Panty Vibrator (Come hither/fingering)",
+        "functions": ["Vibrate"]
+      },
+      "gravity": {
+        "name": "Gravity",
+        "description": "Bluetooth Automatic Thrusting & Vibrating Dildo",
+        "functions": ["Vibrate", "Thrusting"]
+      },
+      "dolce": {
+        "name": "Dolce",
+        "description": "Dual remote controlled vibrators",
+        "functions": ["Vibrate"]
+      },
+       "vulse": {
+        "name": "Vulse",
+        "description": "App-controlled Vibrating and Thrusting G-spot Egg Vibrator",
+        "functions": ["Vibrate", "Thrusting"]
+      },
+      "tenera2": {
+        "name": "Tenera 2",
+        "description": "App-controlled clitoral suction stimulator",
+        "functions": ["Pump"]
+      },
+       "lapis": {
+        "name": "Lapis",
+        "description": "Double-Sided Vibrating Strapless Strap-On",
+        "functions": ["Vibrate"]
+      },
+      "ambi": {
+          "name": "Ambi",
+          "description": "Bluetooth mini bullet vibrator",
+          "functions": ["Vibrate"]
+      },
+      "hyphy": {
+          "name": "Hyphy",
+          "description": "High frequency vibrator",
+          "functions": ["Vibrate"]
+      },
+      "exomoon": {
+          "name": "Exomoon",
+          "description": "Bluetooth bullet lipstick vibrator",
+          "functions": ["Vibrate"]
+      },
+      "gush2": {
+        "name": "Gush 2",
+        "description": "Hands-free, remote-controlled vibrating & oscillating penis massager",
+        "functions": ["Vibrate", "Pump"] 
+      },
+      "gush": {
+        "name": "Gush",
+        "description": "Bluetooth Handsfree Glans Massager",
+        "functions": ["Vibrate", "Pump"] 
+      },
+      "edge2": {
+        "name": "Edge 2",
+        "description": "Adjustable Prostate Massager",
+        "functions": ["Vibrate"]
+      },
+      "solace_pro": {
+        "name": "Solace Pro",
+        "description": "AI-Powered Remote Control Thrusting Male Masturbator",
+        "functions": ["Thrusting", "Pump", "Position"] 
+      },
+       "solace": {
+        "name": "Solace",
+        "description": "App-controlled Automatic Male Masturbator",
+        "functions": ["Thrusting", "Pump"]
+      },
+      "kraken": {
+          "name": "Kraken",
+          "description": "Soft Stretchy Masturbator",
+          "functions": [] 
+      },
+      "max2": {
+        "name": "Max 2",
+        "description": "High Tech Male Masturbator (Air Pump Constriction)",
+        "functions": ["Vibrate", "Pump"]
+      },
+      "diamo": {
+        "name": "Diamo",
+        "description": "Vibrating Cock Ring",
+        "functions": ["Vibrate"]
+      },
+      "calor": {
+        "name": "Calor",
+        "description": "Bluetooth pocket pussy (Air Pump)",
+        "functions": ["Vibrate", "Pump"]
+      },
+      "ridge": {
+        "name": "Ridge",
+        "description": "App-controlled Vibrating and Rotating Anal Beads",
+        "functions": ["Vibrate", "Rotate"]
+      },
+      "hush2": {
+        "name": "Hush 2",
+        "description": "Bluetooth Butt Plug (comes in different sizes)",
+        "functions": ["Vibrate"]
+      },
+      "domi2": {
+        "name": "Domi 2",
+        "description": "Bluetooth Mini Wand",
+        "functions": ["Vibrate"]
+      },
+      "gemini": {
+        "name": "Gemini",
+        "description": "Bluetooth Vibrating Nipple Clamps",
+        "functions": ["Vibrate"]
+      },
+      "lovense_mini_sex_machine": {
+          "name": "Lovense Mini Sex Machine",
+          "description": "App-controlled compact versatile sex machine",
+          "functions": ["Thrusting"]
+      },
+      "lovense_sex_machine": {
+        "name": "Lovense Sex Machine",
+        "description": "Automatic remote controlled thrusting machine",
+        "functions": ["Thrusting"]
+      }
+    }
+  }
