@@ -12,10 +12,9 @@
 
 ## 系統需求 🔧
 
-- Python 3.8+
+- Python 3.12
 - FFmpeg
 - OpenAI API 金鑰
-- yt-dlp
 
 ## 安裝步驟 📦
 
