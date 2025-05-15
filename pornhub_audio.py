@@ -75,13 +75,6 @@ class PornhubAudioDownloader:
             logger.info("正在提取音頻...")
             exit_code = os.system(cmd)
             
-            # 刪除臨時視頻文件
-            logger.info(f"刪除臨時視頻文件: {temp_video_path}")
-            if os.path.exists(temp_video_path):
-                try:
-                    os.remove(temp_video_path)
-                except OSError as remove_err:
-                    logger.warning(f"無法刪除臨時文件 {temp_video_path}: {remove_err}")
             
             if exit_code == 0 and os.path.exists(output_path):
                 logger.info(f"音頻下載並提取成功: {output_path}")

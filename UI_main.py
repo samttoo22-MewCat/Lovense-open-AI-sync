@@ -238,13 +238,9 @@ class App:
         button_frame = ttk.Frame(main_frame, padding="10")
         button_frame.pack(fill=tk.X, pady=10)
         button_frame.columnconfigure(0, weight=1)
-        button_frame.columnconfigure(1, weight=1)
 
-        self.download_button = ttk.Button(button_frame, text="下載影片 + 轉換音檔", command=self.start_download_extract)
-        self.download_button.grid(row=0, column=0, padx=10, pady=5, sticky=tk.EW)
-
-        self.analyze_button = ttk.Button(button_frame, text="轉換為分析檔", command=self.start_transcribe_analyze)
-        self.analyze_button.grid(row=0, column=1, padx=10, pady=5, sticky=tk.EW)
+        self.process_button = ttk.Button(button_frame, text="開始處理", command=self.start_processing)
+        self.process_button.grid(row=0, column=0, padx=10, pady=5, sticky=tk.EW)
 
         # --- 狀態/日誌顯示區 ---
         log_frame = ttk.LabelFrame(main_frame, text="處理狀態與日誌", padding="10")
@@ -255,7 +251,6 @@ class App:
         # --- 狀態管理 ---
         self.processing_thread = None
         self.status_queue = queue.Queue()
-        self.active_buttons = [self.download_button, self.analyze_button] # Main action buttons
 
         # Initial button state update
         self.update_button_states()
@@ -291,66 +286,70 @@ class App:
 
 
     # --- 按鈕命令 ---
-    def start_download_extract(self):
-        url = self.ph_url.get()
-        if not url or not url.startswith("http"):
-            messagebox.showwarning("輸入錯誤", "請在上方輸入有效的 Pornhub 網址。")
-            return
-        # Clear potentially conflicting inputs
-        self.video_path.set("")
-        self.audio_path.set("")
-        self.srt_path.set("")
-        self._start_task(self.download_button, download_extract_thread_func, url)
-
-    def start_transcribe_analyze(self):
-        """Handles Button 2: Transcribes if needed, then analyzes"""
-        audio_input = self.audio_path.get()
-        srt_input = self.srt_path.get()
+    def start_processing(self):
+        """統一的處理入口，自動判斷當前狀態並執行相應步驟"""
         toy_key = self.toy_key_map.get(self.selected_toy_name.get())
-
         if not toy_key:
             messagebox.showwarning("選擇錯誤", "請選擇一個目標玩具型號。")
             return
 
-        # --- Determine the starting point ---
-        if audio_input and os.path.exists(audio_input):
-            self.log_message(f"INFO: 檢測到音訊輸入 '{os.path.basename(audio_input)}'，將先執行轉錄再分析。")
-            # Start transcription, analysis will be chained in check_queue
-            self._start_task(self.analyze_button, transcribe_thread_func, audio_input)
-        elif srt_input and os.path.exists(srt_input):
-             self.log_message(f"INFO: 檢測到 SRT 輸入 '{os.path.basename(srt_input)}'，將直接執行分析。")
-             # Read SRT content first
-             try:
-                 with open(srt_input, 'r', encoding='utf-8') as f:
-                     srt_content = f.read()
-                 if not srt_content:
-                     messagebox.showwarning("檔案錯誤", f"選擇的 SRT 文件 '{srt_input}' 為空。")
-                     return
-                 # Directly start analysis with the content
-                 self._start_task(self.analyze_button, analyze_thread_func, srt_content, srt_input, toy_key)
-             except Exception as e:
-                 messagebox.showerror("讀取錯誤", f"讀取 SRT 文件失敗:\n{e}")
-                 logger.error(f"讀取 SRT 失敗: {traceback.format_exc()}")
-        else:
-            messagebox.showwarning("缺少輸入", "請先提供有效的本地音訊檔案或本地字幕檔案。")
+        # --- 自動判斷當前狀態並執行相應步驟 ---
+        audio_input = self.audio_path.get()
+        srt_input = self.srt_path.get()
+        video_input = self.video_path.get()
+        url_input = self.ph_url.get()
 
+        if audio_input and os.path.exists(audio_input):
+            # 如果有音訊檔案，先轉錄
+            self.log_message(f"INFO: 檢測到音訊輸入 '{os.path.basename(audio_input)}'，將先執行轉錄再分析。")
+            self._start_task(self.process_button, transcribe_thread_func, audio_input)
+        elif srt_input and os.path.exists(srt_input):
+            # 如果有SRT檔案，直接分析
+            self.log_message(f"INFO: 檢測到 SRT 輸入 '{os.path.basename(srt_input)}'，將直接執行分析。")
+            try:
+                with open(srt_input, 'r', encoding='utf-8') as f:
+                    srt_content = f.read()
+                if not srt_content:
+                    messagebox.showwarning("檔案錯誤", f"選擇的 SRT 文件 '{srt_input}' 為空。")
+                    return
+                self._start_task(self.process_button, analyze_thread_func, srt_content, srt_input, toy_key)
+            except Exception as e:
+                messagebox.showerror("讀取錯誤", f"讀取 SRT 文件失敗:\n{e}")
+                logger.error(f"讀取 SRT 失敗: {traceback.format_exc()}")
+        elif video_input and os.path.exists(video_input):
+            # 如果有視訊檔案，先提取音訊再轉錄
+            self.log_message(f"INFO: 檢測到視訊輸入 '{os.path.basename(video_input)}'，將先提取音訊再轉錄分析。")
+            try:
+                import subprocess
+                audio_path = os.path.join(DOWNLOAD_DIR, f"{os.path.splitext(os.path.basename(video_input))[0]}.mp3")
+                subprocess.run(['ffmpeg', '-i', video_input, '-vn', '-acodec', 'libmp3lame', audio_path], check=True)
+                self.audio_path.set(audio_path)
+                self.log_message(f"INFO: 音訊提取完成，開始轉錄...")
+                self._start_task(self.process_button, transcribe_thread_func, audio_path)
+            except Exception as e:
+                messagebox.showerror("音訊提取錯誤", f"從視訊提取音訊失敗:\n{e}")
+                logger.error(f"音訊提取失敗: {traceback.format_exc()}")
+        elif url_input and url_input.startswith("http"):
+            # 如果有網址，先下載再處理
+            self.log_message(f"INFO: 檢測到網址輸入，將開始下載並處理...")
+            self._start_task(self.process_button, download_extract_thread_func, url_input)
+        else:
+            messagebox.showwarning("缺少輸入", "請提供以下任一輸入：\n1. 視訊檔案\n2. 音訊檔案\n3. 字幕檔案\n4. 有效的網址")
 
     def _start_task(self, button, target_func, *args):
         """通用啟動執行緒的內部方法"""
         self._set_all_buttons_state(tk.DISABLED)
 
-        # Clear subsequent results based on which button was pressed
-        if button == self.download_button:
+        # Clear subsequent results based on which function is being called
+        if target_func == download_extract_thread_func:
             self.audio_path.set("")
             self.srt_path.set("")
             self.analysis_result_path.set("")
-        elif button == self.analyze_button:
-             # Clear only analysis result if starting analysis (might be from SRT directly)
-             self.analysis_result_path.set("")
-             # If starting from audio (via transcribe), clear SRT path too
-             if target_func == transcribe_thread_func:
-                  self.srt_path.set("")
-
+        elif target_func == transcribe_thread_func:
+            self.srt_path.set("")
+            self.analysis_result_path.set("")
+        elif target_func == analyze_thread_func:
+            self.analysis_result_path.set("")
 
         self.log_message(f"INFO: 正在啟動 {target_func.__name__}...")
         self.processing_thread = threading.Thread(
@@ -363,28 +362,26 @@ class App:
 
     def _set_all_buttons_state(self, state):
         """啟用或禁用主要操作按鈕"""
-        for btn in self.active_buttons:
-             try: # In case a button doesn't exist yet during init
-                 btn.config(state=state)
-             except: pass
+        try:
+            self.process_button.config(state=state)
+        except: pass
         # Always update based on inputs if enabling
         if state == tk.NORMAL:
-             self.update_button_states()
-
+            self.update_button_states()
 
     def update_button_states(self):
         """根據輸入更新按鈕啟用狀態"""
         if self.processing_thread and self.processing_thread.is_alive():
-            self.download_button.config(state=tk.DISABLED)
-            self.analyze_button.config(state=tk.DISABLED)
+            self.process_button.config(state=tk.DISABLED)
         else:
-            # Download button enabled if URL is present (basic check)
-            self.download_button.config(state=tk.NORMAL if self.ph_url.get() else tk.DISABLED)
-            # Analyze button enabled if EITHER audio OR SRT path is valid
-            analyze_enabled = (self.audio_path.get() and os.path.exists(self.audio_path.get())) or \
-                              (self.srt_path.get() and os.path.exists(self.srt_path.get()))
-            self.analyze_button.config(state=tk.NORMAL if analyze_enabled else tk.DISABLED)
-
+            # Enable button if any valid input is present
+            has_valid_input = (
+                (self.audio_path.get() and os.path.exists(self.audio_path.get())) or
+                (self.srt_path.get() and os.path.exists(self.srt_path.get())) or
+                (self.video_path.get() and os.path.exists(self.video_path.get())) or
+                (self.ph_url.get() and self.ph_url.get().startswith("http"))
+            )
+            self.process_button.config(state=tk.NORMAL if has_valid_input else tk.DISABLED)
 
     def log_message(self, message):
         self.log_text.configure(state='normal')
